@@ -1,0 +1,321 @@
+{
+  "name": "Guest Agent - Live",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1360,
+        -816
+      ],
+      "id": "b536ed67-ada3-4ce1-a236-cce3d8613710",
+      "name": "Telegram Trigger",
+      "webhookId": "f5fb4380-655f-41ca-a62f-fa2b238f2e3e",
+      "credentials": {
+        "telegramApi": {
+          "id": "m4CNwVn5Xu6lJIEE",
+          "name": "Telegram account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are the AI concierge for La Roche Hotel, helping guests via chat.\n\nYour knowledge is strictly limited to:\n1. The hotel's policy knowledge base (use the vector store tool to search it)\n2. Guest booking details (use the booking lookup tool)\n3. Escalating to human staff (use the escalation tool)\n\nRules you must always follow:\n- Never answer from your own general knowledge, training data, or assumptions — even if you think you know the answer.\n- For any question about hotel policies, ALWAYS search the knowledge base tool first rather than answering directly.\n- For any question about a guest's booking, ALWAYS use the booking lookup tool.\n- If a question is about anything outside the hotel — directions to other places, government offices, local businesses, legal or medical advice, or anything not found in your tools — do NOT guess or provide specific details such as addresses, names, or phone numbers from memory.\n- In that case, use the escalation tool, and tell the guest honestly that you don't have that information yourself but a team member will help — without inventing any specific facts.\n- Keep your tone warm, brief, and professional, like a helpful hotel concierge."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -944,
+        -816
+      ],
+      "id": "99d0bff8-c149-4ec6-949b-2a15673d45d9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -1360,
+        -560
+      ],
+      "id": "994e1089-c3bd-49e0-80ac-beeefcc18f2c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BSxEJLic4IemTDgL",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -496,
+        -816
+      ],
+      "id": "b1456901-c21a-41e1-a64b-4883502c6675",
+      "name": "Send a text message",
+      "webhookId": "e7fef493-25b5-4c60-9a40-fa856d3e5d4f",
+      "credentials": {
+        "telegramApi": {
+          "id": "m4CNwVn5Xu6lJIEE",
+          "name": "Telegram account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "La Roche Hotel guest policies, including check-in and check-out times, cancellation policy, parking, Wi-Fi, breakfast, pet policy, accepted payment methods, and policies for extra guests and children."
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        -672,
+        -608
+      ],
+      "id": "ab133da2-65a7-4daf-a63c-227f30724739",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "guest-agent-kb",
+          "mode": "list",
+          "cachedResultName": "guest-agent-kb"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -912,
+        -448
+      ],
+      "id": "10e3e62d-c1de-4edd-8c35-538d959203f1",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "fLqokfJamgH81O3Y",
+          "name": "Pinecone account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        -512
+      ],
+      "id": "50d1fb73-223f-4d31-a039-d4b326bae49a",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BSxEJLic4IemTDgL",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -432,
+        -480
+      ],
+      "id": "a767ce41-2ab7-415f-b6ad-0737ff2dd012",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "BSxEJLic4IemTDgL",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to look up a guest's booking details by their booking reference number. The input should be just the reference, e.g. BK1001.",
+        "jsCode": "const bookings = {\n  \"BK1001\": { guest: \"John Smith\", checkIn: \"2026-07-01\", checkOut: \"2026-07-05\", room: \"Deluxe Room\", status: \"Confirmed, paid in full\" },\n  \"BK1002\": { guest: \"Sarah Lee\", checkIn: \"2026-07-10\", checkOut: \"2026-07-12\", room: \"Standard Room\", status: \"Confirmed, payment pending\" },\n  \"BK1003\": { guest: \"Ahmed Khalil\", checkIn: \"2026-08-01\", checkOut: \"2026-08-03\", room: \"Suite\", status: \"Confirmed, paid in full\" },\n  \"BK1004\": { guest: \"Maria Garcia\", checkIn: \"2026-07-15\", checkOut: \"2026-07-18\", room: \"Standard Room\", status: \"Confirmed, paid in full\" }\n};\n\nconst ref = query.trim().toUpperCase();\nconst booking = bookings[ref];\n\nif (!booking) {\n  return `No booking found with reference ${ref}. Please double check the reference number.`;\n}\n\nreturn `Booking ${ref}: ${booking.guest}, ${booking.room}, check-in ${booking.checkIn}, check-out ${booking.checkOut}. Status: ${booking.status}.`;"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        -1024,
+        -624
+      ],
+      "id": "362f0c51-92cc-4473-8530-ab7ff2a7028c",
+      "name": "Booking Lookup"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool ONLY when you cannot answer the guest's question using your other tools, or when the guest explicitly asks to speak with a real person or hotel staff. Write a short, clear summary of what the guest needs so staff can follow up.",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTool",
+      "typeVersion": 1.2,
+      "position": [
+        -816,
+        -608
+      ],
+      "id": "b3bd5e05-4282-4bcd-a62e-9ae257e41bac",
+      "name": "Send a text message in Telegram",
+      "webhookId": "0215d5d0-c4db-4e78-90f6-0824be122522",
+      "credentials": {
+        "telegramApi": {
+          "id": "m4CNwVn5Xu6lJIEE",
+          "name": "Telegram account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Booking Lookup": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message in Telegram": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "edccf0ba-87c0-446b-9375-e2c84ccee4f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4882ae57fae7f5198ca4a60b64d52e13372c8da31b44d4c64833b5b89f9efda5"
+  },
+  "nodeGroups": [],
+  "id": "E0RXVYs6VufSJywq",
+  "tags": [
+    {
+      "updatedAt": "2026-06-24T09:01:36.583Z",
+      "createdAt": "2026-06-24T09:01:36.583Z",
+      "id": "iqfTAcaqWZv4qG4d",
+      "name": "By Khoshaba Assyrian"
+    }
+  ]
+}
