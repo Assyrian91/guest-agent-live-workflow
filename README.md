@@ -1,5 +1,10 @@
 # Guest Agent — AI Hotel Concierge (RAG + Tool-Calling Agent)
 
+![n8n](https://img.shields.io/badge/n8n-Workflow_Automation-EA4B71?style=for-the-badge&logo=n8n&logoColor=white)
+![Gemini](https://img.shields.io/badge/Google_Gemini-Chat_%26_Embeddings-4285F4?style=for-the-badge&logo=googlegemini&logoColor=white)
+![Pinecone](https://img.shields.io/badge/Pinecone-Vector_DB-000000?style=for-the-badge)
+![Telegram](https://img.shields.io/badge/Telegram-Bot_API-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)
+
 > A conversational AI concierge for La Roche Hotel, built in n8n, combining retrieval-augmented generation (RAG) over real hotel policies with tool-calling for bookings and human escalation — with explicit guardrails against hallucination.
 
 ## Why this project
